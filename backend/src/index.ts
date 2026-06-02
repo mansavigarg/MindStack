@@ -1,13 +1,21 @@
 import  express  from "express";
+import "./models/db.js"
+import { connectDB, UserModel } from "./models/db.js";
+import { ResponseStatus } from "./types/responseStatus.js";
+import userRoutes from "./routes/userRoutes.js"
 
 const app = express();
+app.use(express.json());
+
+app.use("/api/v1/users", userRoutes);
+
 
 
 app.get("/health-check", (req, res) => {
     res.send("Hello World");
 });
 
-app.post("/api/v1/signup", (req,res) => {
+app.post("/api/v1/signup", async (req,res) => {
 
 })
 
@@ -39,8 +47,11 @@ app.get("/api/v1/brain/:shareLink", (req, res) => {
 
 });
 
-
-
-app.listen(3000, () => {
-    console.log("Server is running on port 3000");
-});
+try {
+    connectDB()
+    app.listen(3000, () => {
+        console.log("Server is running on port 3000");
+    });
+} catch (error) {
+    console.log("Error while conneting to localhost")
+}
