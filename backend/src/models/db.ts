@@ -1,18 +1,19 @@
-import mongoose, {model, Schema} from "mongoose";
+import mongoose, { model, Schema } from "mongoose";
 import { env } from "../config/env.js";
 
+
 export const connectDB = async () => {
-    try {
+    try{
         await mongoose.connect(env.MONGODB_URI)
-        console.log("MongoDB connection done")
-    } catch (err) {
-        console.error("MongoDB connection error:", err);
-        process.exit(1);
+        console.log("MongoDB is connected successfully :) ")
+    }catch(err){
+        console.log("MongoDB connection failed --->>", err)
+        process.exit(1)
     }
 }
 
 
-const UserSchema = new Schema({
+const userSchema = new Schema({
     username: {
         type: String,
         unique: true,
@@ -29,4 +30,6 @@ const UserSchema = new Schema({
     }
 })
 
-export const UserModel = model("User", UserSchema)
+
+
+export const userModel = model("User", userSchema)

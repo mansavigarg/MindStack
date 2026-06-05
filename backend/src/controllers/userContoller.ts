@@ -1,59 +1,55 @@
-import { UserModel } from "../models/db.js";
-import { ResponseStatus } from "../types/responseStatus.js";
-import { z } from "zod"
-import type { Request, Response } from "express";
-import { generateAccessToken } from "../utils/generateAccessToken.js";
+import {z} from "zod"
+import { ResponseStatus } from "../types/responseStatus.js"
+import type { Request, Response } from "express"
+import { userModel } from "../models/db.js"
+import { generateAccessToken } from "../utils/generateAccessToken.js"
 
-export const signupSchema = z.object({
-    username: z.string().min(2),
+export const signUpSchema = z.object({
+    username: z.string().min(1),
     email: z.email(),
-    password: z.string().min(2)
+    password: z.string().min(1)
 })
 
 export const signup = async (req: Request, res: Response) => {
-
-    const parsed = signupSchema.safeParse(req.body)
+    const parsed = signUpSchema.safeParse(req.body)  
 
     if(!parsed.success){
-        res.status(ResponseStatus.ValidationError).send({
-            message: "Invalid input"
+        return res.status(ResponseStatus.ValidationError).send({
+            message: "Invalid inputs"
         })
-        return;
     }
 
-    const username = parsed.data.username;
-    const password = parsed.data.password;
-    const email = parsed.data.email;
+    const username = parsed.data.username
+    const password = parsed.data.password
+    const email = parsed.data.email
 
-    let existingUser = await UserModel.findOne({
-        $or: [
-            {username},
-            {email}
+    const existingUser = await userModel.findOne({
+        $or : [
+            {email},
+            {username}
         ]
     })
 
     if(existingUser){
-        res.status(ResponseStatus.ValidationError).send({
+        return res.status(ResponseStatus.ValidationError).send({
             message: "User already exists"
-        });
-        return
+        })
     }
 
-    const user = await UserModel.create({
-        username, 
-        password,
-        email
+    const user = await userModel.create({
+        username,
+        email,
+        password
     })
 
-    const accessToken = generateAccessToken({
-        userID : user._id.toString(),
-        email : email
+    const token = generateAccessToken({
+        email: email,
+        userID: user._id.toString()
     })
-
-    res.status(ResponseStatus.Created).send({
-        message: "User created successfully",
+    
+    res.status(ResponseStatus.Success).send({
+        message: "user created successfully",
         user,
-        accessToken
+        token
     })
-
 }
