@@ -15,13 +15,7 @@ app.get("/health-check", (req, res) => {
     res.send("Hello World");
 });
 
-app.post("/api/v1/signup", async (req,res) => {
 
-})
-
-app.post("/api/v1/signin", (req, res) => {
-
-})
 
 app.post("/api/v1/content", (req, res) => {
 

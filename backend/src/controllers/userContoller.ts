@@ -1,4 +1,4 @@
-import {z} from "zod"
+import {string, z} from "zod"
 import { ResponseStatus } from "../types/responseStatus.js"
 import type { Request, Response } from "express"
 import { userModel } from "../models/db.js"
@@ -52,4 +52,50 @@ export const signup = async (req: Request, res: Response) => {
         user,
         token
     })
+}
+
+const signinSchema = z.object({
+    email: z.email(),
+    password: z.string()
+})
+
+export const signin = async (req: Request, res: Response) => {
+    const parsed = signinSchema.safeParse(req.body)
+
+    if(!parsed.success){
+        return res.status(ResponseStatus.ValidationError).send({
+            message: "Invalid inputs"
+        })
+    }
+
+    const email = parsed.data.email
+    const password = parsed.data.password
+
+    const existingUser = await userModel.findOne({
+        email
+    })
+
+    if(!existingUser){
+        return res.status(ResponseStatus.ValidationError).send({
+            message: "User does not exists."
+        })
+    }
+
+    if(existingUser.password !== password){
+        return res.status(ResponseStatus.Unauthorized).send({
+            message: "Invalid credentials"
+        })
+    }
+
+    const token = generateAccessToken({
+        email: existingUser.email,
+        userID : existingUser._id.toString()
+    })
+
+    res.status(ResponseStatus.Success).send({
+        message: "User signed in successfully",
+        user: existingUser,
+        token
+    })
+
 }
