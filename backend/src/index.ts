@@ -1,14 +1,16 @@
 import  express  from "express";
 import "./models/db.js"
-import { ResponseStatus } from "./types/responseStatus.js";
+import cors from "cors";
+import {env} from "./config/env.js"
 import { connectDB } from "./models/db.js";
+
 import userRoutes from "./routes/userRoutes.js"
+import contentRoutes from "./routes/contentRoutes.js";
+import publicRoute from "./routes/publicRoute.js";
 
 const app = express();
+app.use(cors())
 app.use(express.json());
-
-
-app.use("/api/v1/user", userRoutes)
 
 
 app.get("/health-check", (req, res) => {
@@ -16,35 +18,15 @@ app.get("/health-check", (req, res) => {
 });
 
 
+app.use("/api/v1/user", userRoutes)
+app.use("/api/v1/content", contentRoutes)
+app.use("api/v1", publicRoute)
 
-app.post("/api/v1/content", (req, res) => {
-
-});
-
-app.get("/api/v1/content", (req, res) => {
-
-});
-
-app.delete("/api/v1/content", (req, res) => {
-
-});
-
-app.post("/api/v1/brain/share", (req, res) => {
-
-});
-
-app.post("/api/v1/brain/share", (req, res) => {
-
-});
-
-app.get("/api/v1/brain/:shareLink", (req, res) => {
-
-});
 
 try {
     connectDB();
-    app.listen(3000, () => {
-        console.log("Server is running on port 3000");
+    app.listen(env.PORT, () => {
+        console.log(`Server is running at http://localhost:${env.PORT}`);
     });
 } catch (error) {
     console.log("Error while conneting to localhost")

@@ -30,6 +30,46 @@ const userSchema = new Schema({
     }
 })
 
+const contentSchema = new Schema({
+    title: {
+        type: String,
+        required: true
+    },
+    body: {
+        type: Schema.Types.Mixed, 
+        required: true
+    },
+    type: {
+        type: String,
+        required: true
+    },
+    tags: [{
+        type: String
+    }],
+    link: {
+        type: String,
+        required: false
+    },
+    userId: {
+        type: Schema.Types.ObjectId, 
+        ref: "User",
+        required: true
+    }
+},{
+    timestamps: true
+})
 
 
-export const userModel = model("User", userSchema)
+const linkSchema = new Schema({
+    hash: String,
+    userId: {
+        type: mongoose.Types.ObjectId,
+        ref: "User",
+        required: true,
+    }
+})
+
+
+export const UserModel = model("User", userSchema)
+export const ContentModel = model("Content", contentSchema)
+export const LinkModel = model("Links", linkSchema)

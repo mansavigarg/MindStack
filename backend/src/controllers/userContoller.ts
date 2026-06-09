@@ -1,7 +1,7 @@
 import {string, z} from "zod"
 import { ResponseStatus } from "../types/responseStatus.js"
 import type { Request, Response } from "express"
-import { userModel } from "../models/db.js"
+import { UserModel } from "../models/db.js"
 import { generateAccessToken } from "../utils/generateAccessToken.js"
 
 export const signUpSchema = z.object({
@@ -23,7 +23,7 @@ export const signup = async (req: Request, res: Response) => {
     const password = parsed.data.password
     const email = parsed.data.email
 
-    const existingUser = await userModel.findOne({
+    const existingUser = await UserModel.findOne({
         $or : [
             {email},
             {username}
@@ -36,7 +36,7 @@ export const signup = async (req: Request, res: Response) => {
         })
     }
 
-    const user = await userModel.create({
+    const user = await UserModel.create({
         username,
         email,
         password
@@ -71,7 +71,7 @@ export const signin = async (req: Request, res: Response) => {
     const email = parsed.data.email
     const password = parsed.data.password
 
-    const existingUser = await userModel.findOne({
+    const existingUser = await UserModel.findOne({
         email
     })
 
